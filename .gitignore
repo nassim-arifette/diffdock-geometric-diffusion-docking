@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.tmp/
+benchmark/
+runs/
+outputs/
+colab_artifacts/
+*.download
+*.log
+.env
+
+# built website (cd web && npm run build)
+site/
+web/node_modules/

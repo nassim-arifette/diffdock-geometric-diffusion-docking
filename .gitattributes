@@ -1,0 +1,5 @@
+* text=auto
+*.patch -text
+*.sh text eol=lf
+*.yml text eol=lf
+*.ipynb text eol=lf

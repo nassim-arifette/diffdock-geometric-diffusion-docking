@@ -1,0 +1,12 @@
+# Helper / evaluation environment, separate from pinned DiffDock torch1.13 env.
+# Verified locally on Python3.11. GPU acceptance is recorded separately.
+rdkit==2026.9.1
+posebusters==0.6.5
+py3Dmol==2.5.5
+numpy==2.4.6
+pandas==3.0.6
+PyYAML==6.0.3
+nbformat==5.11.1
+nbclient==0.11.0
+ipykernel==7.4.0
+ipywidgets==8.1.9

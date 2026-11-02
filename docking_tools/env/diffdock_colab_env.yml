@@ -1,0 +1,36 @@
+# Environment for the pinned upstream DiffDock revision (see docking_tools/setup_env.py).
+# Derived from upstream environment.yml; differences:
+#   - conda-forge only (no `defaults` channel), prody/scipy/python taken from conda-forge
+#   - openfold / dllogger / gradio / pybind11 dropped: they are only needed for ESMFold
+#     and the web UI. This notebook always supplies a receptor PDB, so ESMFold is never used.
+#   - fair-esm is installed without the [esmfold] extra for the same reason.
+# `setup_env.py --cpu` swaps the CUDA 11.7 wheel tags for CPU ones (local testing only; Colab uses the CUDA build).
+name: diffdock
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9.18
+  - pip
+  - setuptools=69.5.1
+  - prody=2.2.0
+  - scipy=1.12.0
+  - pip:
+    - --extra-index-url https://download.pytorch.org/whl/cu117
+    - --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
+    - torch==1.13.1+cu117
+    - e3nn==0.5.1
+    - fair-esm==2.0.0
+    - networkx==2.8.4
+    - pandas==1.5.1
+    - pytorch-lightning==1.9.5
+    - rdkit==2022.3.3
+    - scikit-learn==1.1.0
+    - torch-cluster==1.6.0+pt113cu117
+    - torch-geometric==2.2.0
+    - torch-scatter==2.1.0+pt113cu117
+    - torch-sparse==0.6.16+pt113cu117
+    - torch-spline-conv==1.2.1+pt113cu117
+    - torchmetrics==0.11.0
+    - pyyaml
+    - requests
+    - tqdm
