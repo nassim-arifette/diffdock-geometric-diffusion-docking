@@ -247,10 +247,10 @@ export function initPilot() {
   const fig = document.getElementById('fig-pilot')!;
   const pipe = fig.querySelector<HTMLElement>('[data-role=pipeline]')!;
   const rows: [string, string[], string][] = [
-    ['A', ['20 raw candidates', 'rank by DiffDock confidence'], 'The baseline: what DiffDock alone would return.'],
-    ['B', ['20 raw candidates', 'keep physically valid', 'rank by confidence'], 'Does throwing away impossible poses help?'],
-    ['C', ['20 raw candidates', 'keep physically valid', 'rank by GNINA CNNscore'], 'Does an independent scorer choose better?'],
-    ['D', ['20 raw candidates', 'minimise each with GNINA', 'recheck validity', 'rank by CNNscore'], 'Can local refinement repair near misses?'],
+    ['A', ['20 raw candidates', 'rank by DiffDock confidence'], 'The baseline, what DiffDock would return on its own.'],
+    ['B', ['20 raw candidates', 'keep physically valid', 'rank by confidence'], 'Does it help to drop the impossible poses first?'],
+    ['C', ['20 raw candidates', 'keep physically valid', 'rank by GNINA CNNscore'], 'Does an independent scorer pick better?'],
+    ['D', ['20 raw candidates', 'minimise each with GNINA', 'recheck validity', 'rank by CNNscore'], 'Can local refinement fix the near misses?'],
   ];
   for (const [letter, steps, why] of rows) {
     const r = document.createElement('div'); r.className = 'pipe';
@@ -268,5 +268,5 @@ export function initPilot() {
   }
   const status = fig.querySelector<HTMLElement>('[data-role=status]')!;
   const b = document.createElement('b'); b.textContent = 'Status: running. ';
-  status.append(b, 'The development split is being computed on a Colab GPU. Results will be added here together with their manifests, raw poses and logs, then the held-out split will be run once with the unchanged protocol.');
+  status.append(b, 'The development split is running on a Colab GPU. Its results will go here with their manifests, raw poses and logs. After that, the held-out split gets a single run with the protocol unchanged.');
 }

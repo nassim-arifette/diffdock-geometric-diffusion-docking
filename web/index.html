@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Docking by Denoising</title>
+  <title>Docking by denoising</title>
   <meta name="description" content="DiffDock-L places a ligand in its protein pocket by reversing a diffusion. Interactive figures on real candidate poses, their trajectories and their physical checks, and the protocol of a pose-selection pilot." />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
   <script>
@@ -15,7 +15,7 @@
     <div class="hero-viewer" id="hero-viewer" role="img" aria-label="A protein pocket. A ligand starts as random noise and is denoised step by step into a pose; the crystal pose appears at the end for comparison."></div>
     <div class="hero-copy">
       <h1>Docking by denoising</h1>
-      <p class="hero-sub">DiffDock-L places a drug-like molecule in its protein pocket by running a diffusion backwards, from noise to a pose. It proposes ten such poses. This project asks what to do with them.</p>
+      <p class="hero-sub">DiffDock-L places a drug-like molecule in its protein pocket by running a diffusion backwards, from noise to a pose. It proposes ten of them. This project asks what to do with those ten.</p>
     </div>
     <div class="hero-readout" aria-live="polite">
       <div><span class="k">Step</span><span class="v" data-role="step">0 / 18</span></div>
@@ -38,15 +38,15 @@
   <main class="article">
     <section class="tldr" aria-labelledby="tldr-h">
       <h2 id="tldr-h">In short</h2>
-      <p>DiffDock treats molecular docking as generative modelling: it samples where and how a ligand sits in a protein by denoising its position, orientation and flexible bonds. A second network then ranks the samples by confidence.</p>
-      <p>Generating poses and choosing one are different problems. On the run shown here, none of the ten candidates lands within 2 Å of the crystal pose, and every one of them collides with the protein. No ranking can fix that pool.</p>
-      <p>The project builds an auditable pipeline to measure both failures separately, and a frozen pilot that compares four ways of choosing among the same candidates. <strong>Its results are not in yet</strong>; this page shows the method on real outputs and states the protocol in advance.</p>
+      <p>DiffDock treats molecular docking as generative modelling. It samples where and how a ligand sits in a protein by denoising its position, orientation and flexible bonds, and a second network ranks the samples by confidence.</p>
+      <p>Generating poses and choosing one are two separate problems. In the run shown here, none of the ten candidates lands within 2 Å of the crystal pose, and all of them collide with the protein. No ranking can fix that pool.</p>
+      <p>We built an auditable pipeline that measures the two failures separately, plus a frozen pilot comparing four ways of choosing among the same candidates. <strong>The pilot results are not in yet.</strong> For now this page shows the method on real outputs and states the protocol in advance.</p>
     </section>
 
     <section aria-labelledby="s1">
       <h2 id="s1">The pose has three kinds of freedom</h2>
-      <p>The protein is held rigid. What remains to decide about the ligand is where its centre sits, a translation in ℝ³; how it is turned, a rotation in SO(3); and how each rotatable bond is twisted, one angle per torsion. DiffDock adds noise to all three and learns to remove it <a class="cite" href="#ref-diffdock">[1]</a>.</p>
-      <p>The ligand below is the crystal pose of 1A0Q’s ligand, a phosphonate with 23 heavy atoms and 11 torsions in DiffDock’s sense, bonds whose rotation moves more than one atom. Push it around and watch two numbers: how far it is from where it belongs, and whether it starts to overlap the protein.</p>
+      <p>The protein is held rigid. For the ligand, what is left to decide is where its centre sits (a translation in ℝ³), how it is turned (a rotation in SO(3)), and how far each rotatable bond is twisted (one angle per torsion). DiffDock adds noise to all three and learns to remove it <a class="cite" href="#ref-diffdock">[1]</a>.</p>
+      <p>Below is 1A0Q’s ligand in its crystal pose. It is a phosphonate with 23 heavy atoms and 11 torsions in DiffDock’s sense, meaning bonds whose rotation moves more than one atom. Push it around and keep an eye on two numbers: how far it is from where it belongs, and whether it starts to overlap the protein.</p>
     </section>
 
     <figure class="fig wide" id="fig-dof">
@@ -72,8 +72,8 @@
 
     <section aria-labelledby="s2">
       <h2 id="s2">Running the diffusion backwards</h2>
-      <p>Sampling starts from a random pose: the ligand dropped somewhere near the protein, randomly turned and twisted. A score network then proposes, at each of about twenty steps, a small update of translation, rotation and torsions, with the noise level shrinking each time. Positions are only ever changed through those three kinds of moves, so bond lengths and angles stay those of the input conformer.</p>
-      <p>These are the real recorded frames of the ten candidates from one DiffDock-L run on a T4 GPU. Pick a candidate and scrub through its steps.</p>
+      <p>Sampling starts from a random pose. The ligand is dropped somewhere near the protein, turned and twisted at random. Over about twenty steps, a score network proposes small updates to the translation, rotation and torsions while the noise level shrinks. Atoms only ever move through those three kinds of update, so bond lengths and angles stay those of the input conformer.</p>
+      <p>The frames below were recorded during a real DiffDock-L run on a T4 GPU, for all ten candidates. Pick one and scrub through its steps.</p>
     </section>
 
     <figure class="fig wide" id="fig-reverse">
@@ -93,8 +93,8 @@
 
     <section aria-labelledby="s3">
       <h2 id="s3">Ten candidates, none of them right</h2>
-      <p>A confidence model ranks the samples. It is trained to predict closeness to the experimental pose, not binding affinity, and it does not check physics. PoseBusters <a class="cite" href="#ref-posebusters">[3]</a> does: bond lengths, angles, flat rings, internal clashes, and clashes with the protein.</p>
-      <p>Here the confidence ranking puts a 5.2 Å pose first; the closest candidate in the pool, at 3.7 Å, is ranked eighth. Every pose passes the internal chemistry checks and fails the two protein-contact checks. The crystal ligand itself passes them against the same prepared receptor, so the validator is not the problem.</p>
+      <p>A confidence model ranks the samples. It is trained to predict how close a pose is to the experimental one. It does not predict binding affinity, and it does not check physics. PoseBusters <a class="cite" href="#ref-posebusters">[3]</a> does check physics: bond lengths, angles, flat rings, internal clashes, and clashes with the protein.</p>
+      <p>In this run, confidence puts a 5.2 Å pose first, and the closest candidate in the pool (3.7 Å) is ranked eighth. Every pose passes the internal chemistry checks and fails the two protein-contact checks. Since the crystal ligand passes them against the same prepared receptor, the validator is not to blame.</p>
     </section>
 
     <figure class="fig wide" id="fig-pool">
@@ -109,12 +109,12 @@
     </figure>
 
     <section aria-labelledby="s4">
-      <p>So the run fails twice over. The generator produced no near-native pose, and the poses it did produce are physically impossible. A filter that keeps only valid poses would keep none; a better ranker would still pick a wrong pose. Separating these two failures is the whole point of the pilot.</p>
+      <p>So the run fails in two ways. The generator produced no near-native pose, and the poses it did produce are physically impossible. A filter that keeps only valid poses would keep none, and a better ranker would still pick a wrong one. The pilot is there to tell these two failures apart.</p>
     </section>
 
     <section aria-labelledby="s5">
       <h2 id="s5">The pilot: four ways to choose</h2>
-      <p>The protocol was written before any pilot result. It freezes complexes from the 308-case PoseBusters benchmark, generates 20 DiffDock-L candidates per complex and seed, and then compares four selectors on exactly the same candidates. No selector ever sees the reference pose.</p>
+      <p>We wrote the protocol before any pilot result existed. It freezes a set of complexes from the 308-case PoseBusters benchmark and generates 20 DiffDock-L candidates per complex and seed. Four selectors are then compared on exactly the same candidates, and none of them ever sees the reference pose.</p>
     </section>
 
     <figure class="fig wide" id="fig-pilot">
@@ -124,29 +124,29 @@
     </figure>
 
     <section aria-labelledby="s6">
-      <p>The primary outcome is a top-1 pose that is both within 2 Å and physically valid. RMSD-only and validity-only success, top-5, the best pose in each pool (“oracle” quality), abstentions and errors are reported alongside, so a selector cannot look good by refusing hard cases.</p>
+      <p>The primary outcome is a top-1 pose that is within 2 Å and also physically valid. We also report RMSD-only and validity-only success, top-5, the best pose in each pool (“oracle” quality), abstentions and errors. That way a selector cannot look good just by refusing the hard cases.</p>
       <ul class="limits">
-        <li><strong>5 development and 20 evaluation complexes, 3 seeds each.</strong> Seeds are repeated measurements of the same complex, not new data; uncertainty is bootstrapped by complex.</li>
-        <li><strong>The splits are PDB-disjoint, not protein-family-disjoint,</strong> and the checkpoint’s training overlap with the benchmark is not audited.</li>
-        <li><strong>Receptors with metals or covalent links are excluded,</strong> and waters, ions and other heteroatoms are removed, so nothing here speaks to metal, covalent, cofactor or water-mediated binding.</li>
-        <li><strong>Filtering, rescoring and refinement are established methods.</strong> DiffDock-Glide and Matcha already combine them with diffusion docking. The contribution is a transparent comparison and failure analysis at a fixed generation budget.</li>
+        <li>There are 5 development and 20 evaluation complexes, with 3 seeds each. Seeds are repeated measurements of the same complex rather than new data, so uncertainty is bootstrapped by complex.</li>
+        <li>The splits are PDB-disjoint but not protein-family-disjoint, and the checkpoint’s training overlap with the benchmark has not been audited.</li>
+        <li>Receptors with metals or covalent links are excluded, and waters, ions and other heteroatoms are removed. Nothing here tells you anything about metal, covalent, cofactor or water-mediated binding.</li>
+        <li>Filtering, rescoring and refinement are established methods, and DiffDock-Glide and Matcha already combine them with diffusion docking. What we add is a transparent comparison and failure analysis at a fixed generation budget.</li>
       </ul>
     </section>
 
     <section aria-labelledby="s7">
       <h2 id="s7">What the original course project got wrong</h2>
-      <p>The original course report is kept as a course artifact, with a revision note. It docked a ligand into 6AGT that is not that structure’s crystal ligand, read the confidence score as if it measured affinity, and treated a physically plausible pose as a synthesizable one. Its plots are not a traceable baseline. The revised pipeline records the upstream commit, weights, inputs, seeds, effective parameters, GPU and timings of every run, with hashes.</p>
+      <p>The original course report is kept as a course artifact, with a revision note. The ligand it docked into 6AGT is not that structure’s crystal ligand. It also read the confidence score as if it measured affinity, and treated a physically plausible pose as a synthesizable one. Its plots cannot serve as a traceable baseline. The revised pipeline records, with hashes, the upstream commit, weights, inputs, seeds, effective parameters, GPU and timings of every run.</p>
     </section>
 
     <section aria-labelledby="reproduce" class="reproduce">
       <h2 id="reproduce">Run it yourself</h2>
-      <p>The notebooks run in a Colab GPU runtime. DiffDock itself needs a separate pinned Python 3.9 / torch 1.13.1 environment, which the docking notebook installs.</p>
+      <p>The notebooks run in a Colab GPU runtime. DiffDock itself needs a separate pinned Python 3.9 / torch 1.13.1 environment; the docking notebook installs it.</p>
       <ul class="files">
         <li><a href="https://github.com/nassim-arifette/diffdock-geometric-diffusion-docking/blob/main/notebooks/01_geometry.ipynb">01_geometry</a><span>Translations, rotations and bond-axis torsions, with numerical checks.</span></li>
         <li><a href="https://github.com/nassim-arifette/diffdock-geometric-diffusion-docking/blob/main/notebooks/02_docking_colab.ipynb">02_docking_colab</a><span>Pinned install, one complex, verified poses, manifest and export.</span></li>
         <li><a href="https://github.com/nassim-arifette/diffdock-geometric-diffusion-docking/blob/main/notebooks/04_pose_inspector.ipynb">04_pose_inspector</a><span>Saved poses, reference overlay, validity checks and real sampler frames.</span></li>
         <li><a href="https://github.com/nassim-arifette/diffdock-geometric-diffusion-docking/blob/main/notebooks/05_fixed_candidate_pilot.ipynb">05_fixed_candidate_pilot</a><span>The PoseBusters pilot and its paired comparison.</span></li>
-        <li><a href="data/case.json">case.json</a><span>Everything shown above: receptor, crystal ligand, ten poses, their frames and checks.</span></li>
+        <li><a href="data/case.json">case.json</a><span>The data behind the figures above: receptor, crystal ligand, and the ten poses with their frames and checks.</span></li>
       </ul>
 <pre><code>python -m docking_tools.pilot_dataset --out /content/posebusters_pilot
 python -m docking_tools.pilot --manifest /content/posebusters_pilot/pilot_manifest.json --split dev --out /content/pilot_dev
@@ -165,7 +165,7 @@ python -m docking_tools.pilot_summary /content/pilot_dev</code></pre>
   </main>
 
   <footer class="foot">
-    <p>All molecular data come from one archived DiffDock-L acceptance run on PDB 1A0Q. Per-step distances were recomputed with the project’s own evaluation code, which reproduces the recorded RMSD of every pose.</p>
+    <p>All molecular data on this page come from one archived DiffDock-L acceptance run on PDB 1A0Q. We recomputed the per-step distances with the project’s own evaluation code, which reproduces the recorded RMSD of every pose.</p>
   </footer>
 
   <script type="module" src="/src/main.ts"></script>
